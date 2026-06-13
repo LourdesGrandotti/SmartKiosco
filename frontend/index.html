@@ -1,411 +1,549 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Panel de control inteligente para optimización de abastecimiento del kiosco.">
-    <title>SmartKiosco | Asistente de Abastecimiento</title>
 
-    <!-- Google Fonts -->
+    <!-- SEO BÁSICO -->
+    <title>SmartKiosco | Asistente de Abastecimiento Inteligente</title>
+    <meta name="description"
+        content="SmartKiosco: Optimización de stock y comparador inteligente de precios para kioscos minoristas. Analizá faltantes vía CSV y encontrá las mejores ofertas mayoristas.">
+    <meta name="Grandotti_Lourdes" content="SmartKiosco">
+
+    <!-- OPEN GRAPH (REDES SOCIALES) -->
+    <meta property="og:title" content="SmartKiosco | Asistente de Abastecimiento Inteligente">
+    <meta property="og:description"
+        content="Controlá tu stock crítico, compará precios entre múltiples proveedores y optimizá las compras de tu kiosco en tiempo real.">
+    <meta property="og:image" content="assets/og-image.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://smartkiosco.netlify.app/">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+
+    <!-- BOOTSTRAP -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Feather Icons -->
     <script src="https://unpkg.com/feather-icons"></script>
-
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Estilos propios (solo lo que Bootstrap no cubre) -->
+    <!-- CSS PROPIO -->
     <link rel="stylesheet" href="./src/styles/index.css">
 </head>
+
 <body>
 
-<!-- ════════════════════════════════════════════════════════
+    <!-- ════════════════════════════════════════════════════════
      PANTALLA DE AUTENTICACIÓN
 ════════════════════════════════════════════════════════════ -->
-<div id="auth-view" class="auth-screen">
-    <div class="auth-card">
+    <div id="auth-view" class="auth-screen">
+        <div class="auth-card">
 
-        <!-- Logo -->
-        <div class="auth-logo">
-            <i data-feather="box"></i>
-            <h2 class="auth-logo-text">SmartKiosco</h2>
-        </div>
-
-        <!-- Tabs Bootstrap -->
-        <ul class="nav auth-nav border-bottom mb-4" id="authTabs">
-            <li class="nav-item flex-fill text-center">
-                <button class="nav-link w-100 active" id="tab-login" data-bs-toggle="tab" data-bs-target="#pane-login" type="button">
-                    Iniciar Sesión
-                </button>
-            </li>
-            <li class="nav-item flex-fill text-center">
-                <button class="nav-link w-100" id="tab-register" data-bs-toggle="tab" data-bs-target="#pane-register" type="button">
-                    Registrarse
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content">
-
-            <!-- Pane: Login -->
-            <div class="tab-pane fade show active" id="pane-login">
-                <p class="text-center fw-semibold mb-3">Bienvenido de nuevo</p>
-
-                <div id="login-error" class="auth-alert auth-alert--error" role="alert"></div>
-
-                <form id="form-login">
-                    <div class="mb-3">
-                        <label for="login-email" class="form-label text-muted-sk small">Usuario</label>
-                        <input type="text" id="login-email" class="form-control-sk" required placeholder="tu_usuario" autocomplete="username">
-                    </div>
-                    <div class="mb-4">
-                        <label for="login-password" class="form-label text-muted-sk small">Contraseña</label>
-                        <input type="password" id="login-password" class="form-control-sk" required placeholder="••••••••" autocomplete="current-password">
-                    </div>
-                    <button type="submit" class="btn-sk btn-sk--full">Ingresar al Panel</button>
-                </form>
+            <div class="auth-logo">
+                <i data-feather="box"></i>
+                <h2 class="auth-logo-text">SmartKiosco</h2>
             </div>
 
-            <!-- Pane: Registro -->
-            <div class="tab-pane fade" id="pane-register">
-                <p class="text-center fw-semibold mb-3">Crear tu cuenta</p>
+            <!-- Tabs -->
+            <ul class="nav auth-nav border-bottom mb-4" id="authTabs">
+                <li class="nav-item flex-fill text-center">
+                    <button class="nav-link w-100 active" id="tab-login" data-bs-toggle="tab"
+                        data-bs-target="#pane-login" type="button">
+                        Iniciar Sesión
+                    </button>
+                </li>
+                <li class="nav-item flex-fill text-center">
+                    <button class="nav-link w-100" id="tab-register" data-bs-toggle="tab"
+                        data-bs-target="#pane-register" type="button">
+                        Registrarse
+                    </button>
+                </li>
+            </ul>
 
-                <div id="register-success" class="auth-alert auth-alert--success" role="alert"></div>
+            <div class="tab-content">
 
-                <form id="form-register">
-                    <div class="mb-3">
-                        <label for="register-email" class="form-label text-muted-sk small">Usuario</label>
-                        <input type="text" id="register-email" class="form-control-sk" required placeholder="tu_usuario" autocomplete="username">
+                <!-- Pane: Login -->
+                <div class="tab-pane fade show active" id="pane-login">
+                    <p class="text-center fw-semibold mb-1">Bienvenido de nuevo</p>
+                    <p class="text-center text-muted-sk small mb-3">
+                        ¿No tenés cuenta?
+                        <button class="auth-link" id="go-register" type="button">Registrate gratis</button>
+                    </p>
+
+                    <div id="login-error" class="auth-alert auth-alert--error" role="alert"></div>
+
+                    <form id="form-login">
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label text-muted-sk small">Usuario</label>
+                            <input type="text" id="login-email" class="form-control-sk" required
+                                placeholder="tu_usuario" autocomplete="username">
+                        </div>
+                        <div class="mb-2">
+                            <label for="login-password" class="form-label text-muted-sk small">Contraseña</label>
+                            <input type="password" id="login-password" class="form-control-sk" required
+                                placeholder="••••••••" autocomplete="current-password">
+                        </div>
+                        <div class="text-end mb-4">
+                            <button class="auth-link" id="forgot-btn" type="button">¿Olvidaste tu contraseña?</button>
+                        </div>
+                        <button type="submit" class="btn-sk btn-sk--full">Ingresar al Panel</button>
+                    </form>
+
+                    <!-- Mensaje "olvidé contraseña" -->
+                    <div id="forgot-msg" class="auth-alert auth-alert--info mt-3" role="alert">
+                        <i data-feather="info"></i>
+                        Como esta app no tiene backend, los datos se guardan solo en memoria durante la sesión.
+                        Si cerraste el navegador, deberás registrarte nuevamente.
                     </div>
-                    <div class="mb-4">
-                        <label for="register-password" class="form-label text-muted-sk small">Contraseña</label>
-                        <input type="password" id="register-password" class="form-control-sk" required placeholder="••••••••" autocomplete="new-password">
+                </div>
+
+                <!-- Pane: Registro -->
+                <div class="tab-pane fade" id="pane-register">
+                    <p class="text-center fw-semibold mb-1">Crear tu cuenta</p>
+                    <p class="text-center text-muted-sk small mb-3">
+                        ¿Ya tenés cuenta?
+                        <button class="auth-link" id="go-login" type="button">Iniciá sesión</button>
+                    </p>
+
+                    <div id="register-success" class="auth-alert auth-alert--success" role="alert"></div>
+
+                    <!-- Spinner de carga post-registro -->
+                    <div id="register-loading" class="register-loading">
+                        <div class="register-spinner">
+                            <div class="spinner-ring"></div>
+                            <i data-feather="check" class="spinner-check"></i>
+                        </div>
+                        <p class="register-loading-text">Creando tu cuenta...</p>
                     </div>
-                    <button type="submit" class="btn-sk btn-sk--full">Registrarme</button>
-                </form>
+
+                    <form id="form-register">
+                        <div class="mb-3">
+                            <label for="register-email" class="form-label text-muted-sk small">Nombre de usuario</label>
+                            <input type="text" id="register-email" class="form-control-sk" required
+                                placeholder="tu_usuario" autocomplete="username">
+                        </div>
+                        <div class="mb-4">
+                            <label for="register-password" class="form-label text-muted-sk small">Contraseña</label>
+                            <input type="password" id="register-password" class="form-control-sk" required
+                                placeholder="••••••••" autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn-sk btn-sk--full">Registrarme</button>
+                    </form>
+                </div>
+
             </div>
-
         </div>
     </div>
-</div>
 
-<!-- ════════════════════════════════════════════════════════
+    <!-- ════════════════════════════════════════════════════════
+     MODAL: CÓMO SE USA
+════════════════════════════════════════════════════════════ -->
+    <div class="modal fade" id="modalAyuda" tabindex="-1" aria-labelledby="modalAyudaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-sk">
+                <div class="modal-header modal-sk-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <i data-feather="help-circle"></i>
+                        <h5 class="modal-title mb-0" id="modalAyudaLabel">¿Cómo se usa SmartKiosco?</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body modal-sk-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="help-step">
+                                <div class="help-step-num">1</div>
+                                <div>
+                                    <h6>Carga de Stock</h6>
+                                    <p>Subí tu archivo CSV con el inventario actual del kiosco. El formato debe ser CSV.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="help-step">
+                                <div class="help-step-num">2</div>
+                                <div>
+                                    <h6>Análisis automático</h6>
+                                    <p>El sistema clasifica cada producto: <span class="text-critical">Crítico</span> /
+                                        <span class="text-low">Bajo</span> / <span class="text-ok">Normal</span>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="help-step">
+                                <div class="help-step-num">3</div>
+                                <div>
+                                    <h6>Comparador de Ofertas</h6>
+                                    <p>Para cada producto crítico, SmartKiosco muestra cotizaciones de tus proveedores y
+                                        resalta la mejor oferta del momento.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="help-step">
+                                <div class="help-step-num">4</div>
+                                <div>
+                                    <h6>Agenda de Proveedores</h6>
+                                    <p>Gestioná tu lista de proveedores con días de visita, horarios de cierre y acceso
+                                        directo a WhatsApp o web oficial.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
      APLICACIÓN PRINCIPAL
 ════════════════════════════════════════════════════════════ -->
-<div id="app-view" class="app-shell d-none">
+    <div id="app-view" class="app-shell d-none">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <i data-feather="box"></i>
-            <span class="sidebar-logo-text">SmartKiosco</span>
-        </div>
-        <nav class="nav-menu" aria-label="Menú principal">
-            <a href="#" class="nav-item active" data-view="stock">
-                <i data-feather="upload-cloud"></i>
-                <span class="nav-label">Carga de Stock</span>
-            </a>
-            <a href="#" class="nav-item" data-view="ofertas">
-                <i data-feather="dollar-sign"></i>
-                <span class="nav-label">Ofertas</span>
-            </a>
-            <a href="#" class="nav-item" data-view="proveedores">
-                <i data-feather="calendar"></i>
-                <span class="nav-label">Proveedores</span>
-            </a>
-            <a href="#" class="nav-item" data-view="dashboard">
-                <i data-feather="grid"></i>
-                <span class="nav-label">Panel</span>
-            </a>
-        </nav>
-    </aside>
+        <!-- Sidebar -->
+        <aside class="sidebar">
 
-    <!-- Contenido -->
-    <main class="main-content">
+            <!-- Logo (top) -->
+            <div class="sidebar-logo">
+                <i data-feather="box"></i>
+                <span class="sidebar-logo-text">SmartKiosco</span>
+            </div>
 
-        <!-- ── VISTA: CARGA DE STOCK ──────────────────────── -->
-        <section id="view-stock" class="view-section">
-            <header class="section-header">
-                <div>
-                    <h1>Actualización de Inventario</h1>
-                    <p>Arrastrá aquí tu último reporte del sistema (solo formato CSV)</p>
+            <!-- Nav principal (middle, crece para ocupar espacio) -->
+            <nav class="nav-menu nav-menu--main" aria-label="Menú principal">
+                <a href="#" class="nav-item active" data-view="stock">
+                    <i data-feather="upload-cloud"></i>
+                    <span class="nav-label">Carga de Stock</span>
+                </a>
+                <a href="#" class="nav-item" data-view="ofertas">
+                    <i data-feather="dollar-sign"></i>
+                    <span class="nav-label">Ofertas</span>
+                </a>
+                <a href="#" class="nav-item" data-view="proveedores">
+                    <i data-feather="calendar"></i>
+                    <span class="nav-label">Proveedores</span>
+                </a>
+                <a href="#" class="nav-item" data-view="dashboard">
+                    <i data-feather="grid"></i>
+                    <span class="nav-label">Panel</span>
+                </a>
+            </nav>
+
+            <!-- Sección de usuario (bottom) -->
+            <div class="sidebar-user-section">
+                <div class="sidebar-divider"></div>
+
+                <!-- Avatar + nombre -->
+                <div class="sidebar-user-info" id="sidebar-user-info">
+                    <div class="sidebar-user-avatar" id="sidebar-user-avatar">?</div>
+                    <span class="nav-label sidebar-user-name" id="sidebar-user-name">Usuario</span>
                 </div>
-                <div id="header-user-badge"></div>
-            </header>
 
-            <!-- Dropzone -->
-            <div class="dropzone" id="dropzone">
-                <div class="dropzone-icon"><i data-feather="upload-cloud"></i></div>
-                <h3>Arrastrá y soltá tu archivo aquí</h3>
-                <p class="dropzone-sub">o hacé clic para explorar en tu computadora</p>
-                <p class="dropzone-fmt">Solo formato CSV</p>
-                <input type="file" id="file-input" accept=".csv" class="file-input">
-                <button class="btn-sk" type="button" onclick="document.getElementById('file-input').click()">
-                    <i data-feather="folder-open"></i> Explorar archivos
+                <!-- Botón: Cómo se usa -->
+                <button class="nav-item nav-item--btn" type="button" data-bs-toggle="modal"
+                    data-bs-target="#modalAyuda">
+                    <i data-feather="help-circle"></i>
+                    <span class="nav-label">Cómo se usa</span>
+                </button>
+
+                <!-- Botón: Cerrar sesión -->
+                <button class="nav-item nav-item--btn nav-item--danger" id="btn-logout" type="button">
+                    <i data-feather="log-out"></i>
+                    <span class="nav-label">Cerrar sesión</span>
                 </button>
             </div>
 
-            <!-- Resultados -->
-            <div id="results-container" class="d-none">
-                <div class="d-flex align-items-center gap-3 my-3 flex-wrap">
-                    <h4 class="mb-0">Análisis de Stock</h4>
-                    <span class="badge-sk badge-sk--ok" id="file-name-badge">archivo.csv</span>
-                </div>
+        </aside>
 
-                <!-- Stats Bootstrap grid -->
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-sm-4">
-                        <div class="stat-card stat-card--critical">
-                            <div class="stat-icon"><i data-feather="alert-triangle"></i></div>
-                            <div class="stat-info">
-                                <h5>Stock Crítico</h5>
-                                <h2 id="critical-count">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <div class="stat-card stat-card--low">
-                            <div class="stat-icon"><i data-feather="alert-circle"></i></div>
-                            <div class="stat-info">
-                                <h5>Stock Bajo</h5>
-                                <h2 id="low-count">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <div class="stat-card stat-card--ok">
-                            <div class="stat-icon"><i data-feather="check-circle"></i></div>
-                            <div class="stat-info">
-                                <h5>Stock Normal</h5>
-                                <h2 id="ok-count">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Contenido principal -->
+        <main class="main-content">
 
-                <!-- Tabla -->
-                <div class="sk-table-wrap">
-                    <table class="sk-table">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Estado</th>
-                                <th>Acción sugerida</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body"></tbody>
-                    </table>
-                </div>
-
-                <!-- Pie de resultados -->
-                <div class="d-flex flex-column gap-3">
-                    <div class="upload-ok">
-                        <i data-feather="check-circle"></i>
-                        <span>El reporte fue procesado correctamente.</span>
-                    </div>
+            <!-- ── VISTA: CARGA DE STOCK ──────────────────────── -->
+            <section id="view-stock" class="view-section">
+                <header class="section-header">
                     <div>
-                        <button class="btn-sk btn-sk--ghost" type="button" onclick="resetUpload()">
-                            <i data-feather="refresh-cw"></i> Cargar otro archivo
-                        </button>
+                        <h1>Actualización de Inventario</h1>
+                        <p>Arrastrá aquí tu último reporte del sistema (solo formato CSV)</p>
                     </div>
+                </header>
+
+                <div class="dropzone" id="dropzone">
+                    <div class="dropzone-icon"><i data-feather="upload-cloud"></i></div>
+                    <h3>Arrastrá y soltá tu archivo aquí</h3>
+                    <p class="dropzone-sub">o hacé clic para explorar en tu computadora</p>
+                    <p class="dropzone-fmt">Solo formato CSV</p>
+                    <input type="file" id="file-input" accept=".csv" class="file-input">
+                    <button class="btn-sk" type="button" onclick="document.getElementById('file-input').click()">
+                        <i data-feather="folder-open"></i> Explorar archivos
+                    </button>
                 </div>
-            </div>
 
-            <div class="view-footer view-footer--end">
-                <button class="btn-sk" type="button" onclick="navTo('ofertas')">
-                    Ver Ofertas <i data-feather="chevron-right"></i>
-                </button>
-            </div>
-        </section>
+                <div id="results-container" class="d-none">
+                    <div class="d-flex align-items-center gap-3 my-3 flex-wrap">
+                        <h4 class="mb-0">Análisis de Stock</h4>
+                        <span class="badge-sk badge-sk--ok" id="file-name-badge">archivo.csv</span>
+                    </div>
 
-        <!-- ── VISTA: OFERTAS ─────────────────────────────── -->
-        <section id="view-ofertas" class="view-section hidden">
-            <header class="section-header">
-                <div>
-                    <h1>Comparador de Precios</h1>
-                    <p>Licitación inteligente de tu canasta crítica de reposición.</p>
-                </div>
-            </header>
-
-            <div id="offers-container">
-                <p class="empty-state">Cargá un reporte de stock primero para ver cotizaciones inteligentes.</p>
-            </div>
-
-            <div class="view-footer">
-                <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('stock')">
-                    <i data-feather="chevron-left"></i> Carga de Stock
-                </button>
-                <button class="btn-sk" type="button" onclick="navTo('proveedores')">
-                    Ver Proveedores <i data-feather="chevron-right"></i>
-                </button>
-            </div>
-        </section>
-
-        <!-- ── VISTA: PROVEEDORES ─────────────────────────── -->
-        <section id="view-proveedores" class="view-section hidden">
-            <header class="section-header">
-                <div>
-                    <h1>Agenda de Proveedores</h1>
-                    <p>Control de fechas de visita física y cierres de pedidos.</p>
-                </div>
-            </header>
-
-            <!-- Formulario nuevo proveedor -->
-            <div class="prov-form-card">
-                <h4>Añadir nuevo proveedor</h4>
-                <form id="form-proveedor">
-                    <div class="row g-3 align-items-end">
-
-                        <div class="col-12 col-md-4">
-                            <label for="prov-name" class="form-label text-muted-sk small">Nombre</label>
-                            <input type="text" id="prov-name" class="form-control-sk" required placeholder="Ej. Arcor">
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label text-muted-sk small d-block mb-2">Visita Física</label>
-                            <div class="d-flex flex-wrap gap-2">
-                                <input type="checkbox" class="day-pill-check prov-day-check" id="chkLun" value="Lunes">
-                                <label class="day-pill-label" for="chkLun">Lun</label>
-                                <input type="checkbox" class="day-pill-check prov-day-check" id="chkMar" value="Martes">
-                                <label class="day-pill-label" for="chkMar">Mar</label>
-                                <input type="checkbox" class="day-pill-check prov-day-check" id="chkMie" value="Miércoles">
-                                <label class="day-pill-label" for="chkMie">Mié</label>
-                                <input type="checkbox" class="day-pill-check prov-day-check" id="chkJue" value="Jueves">
-                                <label class="day-pill-label" for="chkJue">Jue</label>
-                                <input type="checkbox" class="day-pill-check prov-day-check" id="chkVie" value="Viernes">
-                                <label class="day-pill-label" for="chkVie">Vie</label>
-                                <input type="checkbox" class="day-pill-check prov-day-check" id="chkSab" value="Sábado">
-                                <label class="day-pill-label" for="chkSab">Sáb</label>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-card stat-card--critical">
+                                <div class="stat-icon"><i data-feather="alert-triangle"></i></div>
+                                <div class="stat-info">
+                                    <h5>Stock Crítico</h5>
+                                    <h2 id="critical-count">0</h2>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="col-6 col-md-3">
-                            <label for="prov-close-day" class="form-label text-muted-sk small">Cierre (Día)</label>
-                            <select id="prov-close-day" class="form-select-sk" required>
-                                <option value="" disabled selected>Elegir</option>
-                                <option>Lunes</option><option>Martes</option>
-                                <option>Miércoles</option><option>Jueves</option>
-                                <option>Viernes</option><option>Sábado</option>
-                            </select>
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-card stat-card--low">
+                                <div class="stat-icon"><i data-feather="alert-circle"></i></div>
+                                <div class="stat-info">
+                                    <h5>Stock Bajo</h5>
+                                    <h2 id="low-count">0</h2>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="col-6 col-md-3">
-                            <label for="prov-close-hr" class="form-label text-muted-sk small">Cierre (Hora)</label>
-                            <input type="time" id="prov-close-hr" class="form-control-sk" required>
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-card stat-card--ok">
+                                <div class="stat-icon"><i data-feather="check-circle"></i></div>
+                                <div class="stat-info">
+                                    <h5>Stock Normal</h5>
+                                    <h2 id="ok-count">0</h2>
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="col-12 col-md-4">
-                            <label for="prov-phone" class="form-label text-muted-sk small">Tel WhatsApp (opcional)</label>
-                            <input type="tel" id="prov-phone" class="form-control-sk" pattern="[0-9]+" placeholder="Ej. 1144445555">
+                    <div class="sk-table-wrap">
+                        <table class="sk-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Estado</th>
+                                    <th>Acción sugerida</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="upload-ok">
+                            <i data-feather="check-circle"></i>
+                            <span>El reporte fue procesado correctamente.</span>
                         </div>
-
-                        <div class="col-12 col-md-6">
-                            <label for="prov-url" class="form-label text-muted-sk small">Enlace web (opcional)</label>
-                            <input type="url" id="prov-url" class="form-control-sk" placeholder="https://ejemplo.com">
-                        </div>
-
-                        <div class="col-12 col-md-3">
-                            <button type="submit" class="btn-sk btn-sk--full">
-                                <i data-feather="plus"></i> Agregar
+                        <div>
+                            <button class="btn-sk btn-sk--ghost" type="button" onclick="resetUpload()">
+                                <i data-feather="refresh-cw"></i> Cargar otro archivo
                             </button>
                         </div>
-
-                    </div>
-                </form>
-            </div>
-
-            <!-- Lista de proveedores Bootstrap grid -->
-            <div class="row g-3" id="providers-container"></div>
-
-            <div class="view-footer">
-                <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('ofertas')">
-                    <i data-feather="chevron-left"></i> Ofertas
-                </button>
-                <button class="btn-sk" type="button" onclick="navTo('dashboard')">
-                    Panel de Control <i data-feather="chevron-right"></i>
-                </button>
-            </div>
-        </section>
-
-        <!-- ── VISTA: PANEL DE CONTROL ───────────────────── -->
-        <section id="view-dashboard" class="view-section hidden">
-            <header class="section-header">
-                <div>
-                    <h1>Panel de Control</h1>
-                    <p>Resumen de tu negocio y estado de abastecimiento</p>
-                </div>
-            </header>
-
-            <div id="dashboard-empty" class="empty-state">
-                Cargá un archivo de stock en la primera pantalla para visualizar el estado de tu negocio aquí.
-            </div>
-
-            <div id="dashboard-data" class="d-none">
-                <!-- KPIs -->
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-sm-4">
-                        <div class="stat-card stat-card--accent">
-                            <div class="stat-icon"><i data-feather="trending-up"></i></div>
-                            <div class="stat-info">
-                                <h5>Total artículos</h5>
-                                <h2 id="dash-total">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <div class="stat-card stat-card--critical">
-                            <div class="stat-icon"><i data-feather="alert-octagon"></i></div>
-                            <div class="stat-info">
-                                <h5>Alertas de quiebre</h5>
-                                <h2 id="dash-critical">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <div class="stat-card stat-card--ok">
-                            <div class="stat-icon"><i data-feather="truck"></i></div>
-                            <div class="stat-info">
-                                <h5>Estado bueno</h5>
-                                <h2 id="dash-ok">0</h2>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Gráfico -->
-                <div class="chart-card">
-                    <h4>Salud del Inventario</h4>
-                    <div class="canvas-wrap">
-                        <canvas id="stockChart"></canvas>
+                <div class="view-footer view-footer--end">
+                    <button class="btn-sk" type="button" onclick="navTo('ofertas')">
+                        Ver Ofertas <i data-feather="chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ── VISTA: OFERTAS ─────────────────────────────── -->
+            <section id="view-ofertas" class="view-section hidden">
+                <header class="section-header">
+                    <div>
+                        <h1>Comparador de Precios</h1>
+                        <p>Licitación inteligente de tu canasta crítica de reposición.</p>
+                    </div>
+                </header>
+
+                <div id="offers-container">
+                    <p class="empty-state">Cargá un reporte de stock primero para ver cotizaciones inteligentes.</p>
+                </div>
+
+                <div class="view-footer">
+                    <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('stock')">
+                        <i data-feather="chevron-left"></i> Carga de Stock
+                    </button>
+                    <button class="btn-sk" type="button" onclick="navTo('proveedores')">
+                        Ver Proveedores <i data-feather="chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ── VISTA: PROVEEDORES ─────────────────────────── -->
+            <section id="view-proveedores" class="view-section hidden">
+                <header class="section-header">
+                    <div>
+                        <h1>Agenda de Proveedores</h1>
+                        <p>Control de fechas de visita física y cierres de pedidos.</p>
+                    </div>
+                </header>
+
+                <div class="prov-form-card">
+                    <h4>Añadir nuevo proveedor</h4>
+                    <form id="form-proveedor">
+                        <div class="row g-3 align-items-end">
+
+                            <div class="col-12 col-md-4">
+                                <label for="prov-name" class="form-label text-muted-sk small">Nombre</label>
+                                <input type="text" id="prov-name" class="form-control-sk" required
+                                    placeholder="Ej. Arcor">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label text-muted-sk small d-block mb-2">Visita Física</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <input type="checkbox" class="day-pill-check prov-day-check" id="chkLun"
+                                        value="Lunes">
+                                    <label class="day-pill-label" for="chkLun">Lun</label>
+                                    <input type="checkbox" class="day-pill-check prov-day-check" id="chkMar"
+                                        value="Martes">
+                                    <label class="day-pill-label" for="chkMar">Mar</label>
+                                    <input type="checkbox" class="day-pill-check prov-day-check" id="chkMie"
+                                        value="Miércoles">
+                                    <label class="day-pill-label" for="chkMie">Mié</label>
+                                    <input type="checkbox" class="day-pill-check prov-day-check" id="chkJue"
+                                        value="Jueves">
+                                    <label class="day-pill-label" for="chkJue">Jue</label>
+                                    <input type="checkbox" class="day-pill-check prov-day-check" id="chkVie"
+                                        value="Viernes">
+                                    <label class="day-pill-label" for="chkVie">Vie</label>
+                                    <input type="checkbox" class="day-pill-check prov-day-check" id="chkSab"
+                                        value="Sábado">
+                                    <label class="day-pill-label" for="chkSab">Sáb</label>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <label for="prov-close-day" class="form-label text-muted-sk small">Cierre (Día)</label>
+                                <select id="prov-close-day" class="form-select-sk" required>
+                                    <option value="" disabled selected>Elegir</option>
+                                    <option>Lunes</option>
+                                    <option>Martes</option>
+                                    <option>Miércoles</option>
+                                    <option>Jueves</option>
+                                    <option>Viernes</option>
+                                    <option>Sábado</option>
+                                </select>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <label for="prov-close-hr" class="form-label text-muted-sk small">Cierre (Hora)</label>
+                                <input type="time" id="prov-close-hr" class="form-control-sk" required>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="prov-phone" class="form-label text-muted-sk small">Tel WhatsApp
+                                    (opcional)</label>
+                                <input type="tel" id="prov-phone" class="form-control-sk" pattern="[0-9]+"
+                                    placeholder="Ej. 1144445555">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="prov-url" class="form-label text-muted-sk small">Enlace web
+                                    (opcional)</label>
+                                <input type="url" id="prov-url" class="form-control-sk"
+                                    placeholder="https://ejemplo.com">
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <button type="submit" class="btn-sk btn-sk--full">
+                                    <i data-feather="plus"></i> Agregar
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row g-3" id="providers-container"></div>
+
+                <div class="view-footer">
+                    <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('ofertas')">
+                        <i data-feather="chevron-left"></i> Ofertas
+                    </button>
+                    <button class="btn-sk" type="button" onclick="navTo('dashboard')">
+                        Panel de Control <i data-feather="chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ── VISTA: PANEL DE CONTROL ───────────────────── -->
+            <section id="view-dashboard" class="view-section hidden">
+                <header class="section-header">
+                    <div>
+                        <h1>Panel de Control</h1>
+                        <p>Resumen de tu negocio y estado de abastecimiento</p>
+                    </div>
+                </header>
+
+                <div id="dashboard-empty" class="empty-state">
+                    Cargá un archivo de stock en la primera pantalla para visualizar el estado de tu negocio aquí.
+                </div>
+
+                <div id="dashboard-data" class="d-none">
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-card stat-card--accent">
+                                <div class="stat-icon"><i data-feather="trending-up"></i></div>
+                                <div class="stat-info">
+                                    <h5>Total artículos</h5>
+                                    <h2 id="dash-total">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-card stat-card--critical">
+                                <div class="stat-icon"><i data-feather="alert-octagon"></i></div>
+                                <div class="stat-info">
+                                    <h5>Alertas de quiebre</h5>
+                                    <h2 id="dash-critical">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-card stat-card--ok">
+                                <div class="stat-icon"><i data-feather="truck"></i></div>
+                                <div class="stat-info">
+                                    <h5>Estado bueno</h5>
+                                    <h2 id="dash-ok">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Salud del Inventario</h4>
+                        <div class="canvas-wrap">
+                            <canvas id="stockChart"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="view-footer">
-                <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('proveedores')">
-                    <i data-feather="chevron-left"></i> Proveedores
-                </button>
-                <button class="btn-sk" type="button" onclick="navTo('stock')">
-                    Volver a Carga de Stock <i data-feather="corner-up-left"></i>
-                </button>
-            </div>
-        </section>
+                <div class="view-footer">
+                    <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('proveedores')">
+                        <i data-feather="chevron-left"></i> Proveedores
+                    </button>
+                    <button class="btn-sk" type="button" onclick="navTo('stock')">
+                        Volver a Carga de Stock <i data-feather="corner-up-left"></i>
+                    </button>
+                </div>
+            </section>
 
-    </main>
-</div>
+        </main>
+    </div>
 
-<!-- Bootstrap JS (necesario para tabs) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Lógica de la app -->
-<script src="./src/app.js"></script>
-<script>feather.replace();</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./src/app.js"></script>
+    <script>feather.replace();</script>
 </body>
+
 </html>
