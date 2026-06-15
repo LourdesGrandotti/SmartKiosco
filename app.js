@@ -7,26 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let usuariosRegistrados = [];
     let usuarioActivo = null;
 
-    const authView     = document.getElementById('auth-view');
-    const appView      = document.getElementById('app-view');
-    const formLogin    = document.getElementById('form-login');
+    const authView = document.getElementById('auth-view');
+    const appView = document.getElementById('app-view');
+    const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
-    const loginError   = document.getElementById('login-error');
-    const registerMsg  = document.getElementById('register-success');
+    const loginError = document.getElementById('login-error');
+    const registerMsg = document.getElementById('register-success');
     const registerLoading = document.getElementById('register-loading');
     const registerSpinner = registerLoading.querySelector('.register-spinner');
     const registerLoadingText = registerLoading.querySelector('.register-loading-text');
 
     function showAlert(el, text, show = true) {
         el.textContent = text;
-        el.classList.toggle('visible', show);
-    }
-
-    function showAlertWithIcon(el, text, show = true) {
-        if (show) {
-            el.innerHTML = `<i data-feather="check-circle"></i><span>${text}</span>`;
-            feather.replace();
-        }
         el.classList.toggle('visible', show);
     }
 
@@ -48,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Registro
     formRegister.addEventListener('submit', e => {
         e.preventDefault();
-        const usuario  = document.getElementById('register-email').value.trim();
+        const usuario = document.getElementById('register-email').value.trim();
         const password = document.getElementById('register-password').value.trim();
 
         if (usuariosRegistrados.find(u => u.usuario === usuario)) {
@@ -85,9 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Login
     formLogin.addEventListener('submit', e => {
         e.preventDefault();
-        const usuario  = document.getElementById('login-email').value.trim();
+        const usuario = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value.trim();
-        const cuenta   = usuariosRegistrados.find(u => u.usuario === usuario);
+        const cuenta = usuariosRegistrados.find(u => u.usuario === usuario);
 
         if (!cuenta) {
             showAlert(loginError, 'Usuario no registrado. Creá una cuenta primero.');
@@ -103,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Cerrar sesión (botón en sidebar)
     document.getElementById('btn-logout').addEventListener('click', () => {
         usuarioActivo = null;
         appView.classList.add('d-none');
@@ -113,12 +104,26 @@ document.addEventListener('DOMContentLoaded', () => {
         bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-login')).show();
     });
 
-    /** Actualiza el avatar y nombre de usuario en el sidebar */
+    const logoutMobile = document.getElementById('btn-logout-mobile');
+    if (logoutMobile) {
+        logoutMobile.addEventListener('click', () => {
+            document.getElementById('btn-logout').click();
+        });
+    }
+
+    /** Actualiza el avatar y nombre de usuario en el sidebar y móvil */
     function actualizarSidebarUsuario(nombre) {
         const avatar = document.getElementById('sidebar-user-avatar');
-        const label  = document.getElementById('sidebar-user-name');
-        if (avatar) avatar.textContent = nombre.charAt(0).toUpperCase();
-        if (label)  label.textContent  = nombre;
+        const label = document.getElementById('sidebar-user-name');
+        const mobileAvatar = document.getElementById('mobile-user-avatar');
+        const mobileLabel = document.getElementById('mobile-user-name');
+
+        const inicial = nombre.charAt(0).toUpperCase();
+
+        if (avatar) avatar.textContent = inicial;
+        if (label) label.textContent = nombre;
+        if (mobileAvatar) mobileAvatar.textContent = inicial;
+        if (mobileLabel) mobileLabel.textContent = nombre;
     }
 
     // ══════════════════════════════════════════════════════════
@@ -126,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ══════════════════════════════════════════════════════════
 
     const navItems = document.querySelectorAll('.nav-item[data-view]');
-    const views    = document.querySelectorAll('.view-section');
+    const views = document.querySelectorAll('.view-section');
 
     function navigateTo(viewId) {
         views.forEach(v => v.classList.add('hidden'));
@@ -148,7 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
         feather.replace();
     }
 
-    window.navTo = navigateTo;
+    // Navegación mediante atributos data-nav (botones en el footer de vistas)
+    document.querySelectorAll('[data-nav]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            navigateTo(btn.getAttribute('data-nav'));
+        });
+    });
 
     navItems.forEach(item => {
         item.addEventListener('click', e => {
@@ -197,11 +207,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. DRAG & DROP Y PROCESAMIENTO CSV
     // ══════════════════════════════════════════════════════════
 
-    const dropzone         = document.getElementById('dropzone');
-    const fileInput        = document.getElementById('file-input');
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
     const resultsContainer = document.getElementById('results-container');
-    const tableBody        = document.getElementById('table-body');
-    const fileNameBadge    = document.getElementById('file-name-badge');
+    const tableBody = document.getElementById('table-body');
+    const fileNameBadge = document.getElementById('file-name-badge');
 
     if (dropzone) {
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
@@ -212,6 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ['dragleave', 'drop'].forEach(ev => dropzone.addEventListener(ev, () => dropzone.classList.remove('drag-over')));
         dropzone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
         fileInput.addEventListener('change', function () { handleFiles(this.files); });
+
+        // Botón explorar archivos
+        const btnBrowse = document.getElementById('btn-browse-files');
+        if (btnBrowse) {
+            btnBrowse.addEventListener('click', () => {
+                fileInput.click();
+            });
+        }
     }
 
     function handleFiles(files) {
@@ -239,10 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (lines.length <= 1) {
             const demo = [
-                { name: 'Coca-Cola 1.5L',       qty: 2,  status: 'critical', label: 'Crítico', action: 'Pedir inmediato', categoria: 'gaseosas'  },
-                { name: 'Aquarius Pera 1.5L',    qty: 5,  status: 'low',      label: 'Bajo',    action: 'Reponer pronto',  categoria: 'bebidas'   },
-                { name: 'Galletitas Chocolinas', qty: 24, status: 'ok',       label: 'Normal',  action: 'Mantener',        categoria: 'almacen'   },
-                { name: 'Alfajor Arcor',         qty: 1,  status: 'critical', label: 'Crítico', action: 'Pedir inmediato', categoria: 'golosinas' }
+                { name: 'Coca-Cola 1.5L', qty: 2, status: 'critical', label: 'Crítico', action: 'Pedir inmediato', categoria: 'gaseosas' },
+                { name: 'Aquarius Pera 1.5L', qty: 5, status: 'low', label: 'Bajo', action: 'Reponer pronto', categoria: 'bebidas' },
+                { name: 'Galletitas Chocolinas', qty: 24, status: 'ok', label: 'Normal', action: 'Mantener', categoria: 'almacen' },
+                { name: 'Alfajor Arcor', qty: 1, status: 'critical', label: 'Crítico', action: 'Pedir inmediato', categoria: 'golosinas' }
             ];
             critical = 2; low = 1; ok = 1;
             globalStock = demo;
@@ -251,27 +269,27 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(',').map(c => c.trim());
                 if (cols.length < 2) continue;
-                const name     = cols[0];
-                const qty      = parseInt(cols[1], 10) || 0;
+                const name = cols[0];
+                const qty = parseInt(cols[1], 10) || 0;
                 const categoria = cols[2] ? cols[2].toLowerCase() : 'general';
                 let status, label, action;
-                if      (qty <= 3)  { status = 'critical'; label = 'Crítico'; action = 'Pedir inmediato'; critical++; }
-                else if (qty <= 10) { status = 'low';      label = 'Bajo';    action = 'Reponer pronto';  low++; }
-                else                { status = 'ok';       label = 'Normal';  action = 'Mantener';        ok++; }
+                if (qty <= 3) { status = 'critical'; label = 'Crítico'; action = 'Pedir inmediato'; critical++; }
+                else if (qty <= 10) { status = 'low'; label = 'Bajo'; action = 'Reponer pronto'; low++; }
+                else { status = 'ok'; label = 'Normal'; action = 'Mantener'; ok++; }
                 globalStock.push({ name, qty, status, categoria });
                 html += buildRow(name, qty, status, label, action);
             }
         }
 
         document.getElementById('critical-count').textContent = critical;
-        document.getElementById('low-count').textContent      = low;
-        document.getElementById('ok-count').textContent       = ok;
+        document.getElementById('low-count').textContent = low;
+        document.getElementById('ok-count').textContent = ok;
         tableBody.innerHTML = html;
 
         const total = globalStock.length;
-        setText('dash-total',    total);
+        setText('dash-total', total);
         setText('dash-critical', critical);
-        setText('dash-ok',       ok);
+        setText('dash-ok', ok);
 
         chartData = { ok, low, critical };
 
@@ -281,6 +299,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         generarSugerencias(globalStock);
+    }
+
+    function resetUpload() {
+        const dz = document.getElementById('dropzone');
+        const rc = document.getElementById('results-container');
+        const fi = document.getElementById('file-input');
+        if (dz) dz.style.display = '';
+        if (rc) rc.classList.add('d-none');
+        if (fi) fi.value = '';
+    }
+
+    const btnReset = document.getElementById('btn-reset-upload');
+    if (btnReset) {
+        btnReset.addEventListener('click', resetUpload);
     }
 
     function setText(id, val) {
@@ -309,13 +341,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ══════════════════════════════════════════════════════════
 
     let listaProveedores = [
-        { id: 1, nombre: 'Arcor',          rubros: ['golosinas','galletas'],                                           visitaFisica: 'Lunes',   cierreVirtual: 'Viernes a las 18:00hs',  telefono: '08003332726', enlaceOficial: 'https://www.arcorencasa.com'  },
-        { id: 2, nombre: 'Coca-Cola',       rubros: ['bebidas','gaseosas'],                                            visitaFisica: 'Jueves',  cierreVirtual: 'Miércoles a las 12:00hs',telefono: '08008882622', enlaceOficial: 'https://www.coca-cola.com.ar' },
-        { id: 3, nombre: 'Mayorista Vital', rubros: ['general','alimentos','bebidas','gaseosas','golosinas','almacen'],visitaFisica: 'Martes',  cierreVirtual: 'Lunes a las 17:00hs',    telefono: '08102228482', enlaceOficial: 'https://www.vital.com.ar'     },
-        { id: 4, nombre: 'Maxiconsumo',     rubros: ['general','alimentos','bebidas','gaseosas','golosinas','almacen'],visitaFisica: 'Viernes', cierreVirtual: 'Jueves a las 18:00hs',   telefono: '08107776294', enlaceOficial: 'https://maxiconsumo.com'      }
+        { id: 1, nombre: 'Arcor', rubros: ['golosinas', 'galletas'], visitaFisica: 'Lunes', cierreVirtual: 'Viernes a las 18:00hs', telefono: '08003332726', enlaceOficial: 'https://www.arcorencasa.com' },
+        { id: 2, nombre: 'Coca-Cola', rubros: ['bebidas', 'gaseosas'], visitaFisica: 'Jueves', cierreVirtual: 'Miércoles a las 12:00hs', telefono: '08008882622', enlaceOficial: 'https://www.coca-cola.com.ar' },
+        { id: 3, nombre: 'Mayorista Vital', rubros: ['general', 'alimentos', 'bebidas', 'gaseosas', 'golosinas', 'almacen'], visitaFisica: 'Martes', cierreVirtual: 'Lunes a las 17:00hs', telefono: '08102228482', enlaceOficial: 'https://www.vital.com.ar' },
+        { id: 4, nombre: 'Maxiconsumo', rubros: ['general', 'alimentos', 'bebidas', 'gaseosas', 'golosinas', 'almacen'], visitaFisica: 'Viernes', cierreVirtual: 'Jueves a las 18:00hs', telefono: '08107776294', enlaceOficial: 'https://maxiconsumo.com' }
     ];
 
-    const formProveedor      = document.getElementById('form-proveedor');
+    const formProveedor = document.getElementById('form-proveedor');
     const providersContainer = document.getElementById('providers-container');
 
     function renderProveedores() {
@@ -328,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         listaProveedores.forEach(prov => {
-            const tel    = (prov.telefono || '').replace(/\D/g, '');
+            const tel = (prov.telefono || '').replace(/\D/g, '');
             const wppUrl = `https://wa.me/549${tel}?text=Hola%2C%20te%20escribo%20desde%20SmartKiosco%20para%20consultar%20sobre%20el%20pedido`;
             const telText = prov.telefono && prov.telefono !== 'No asignado' ? prov.telefono : '—';
 
@@ -354,8 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="d-flex gap-2">
-                        <button class="btn-sk flex-fill justify-content-center" type="button"
-                            onclick="window.open('${wppUrl}', '_blank')">
+                        <button class="btn-sk flex-fill justify-content-center btn-wpp" type="button" data-url="${wppUrl}">
                             <i data-feather="message-circle"></i> WhatsApp
                         </button>
                         <button class="btn-sk btn-sk--danger flex-fill justify-content-center btn-del-prov"
@@ -377,24 +408,30 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        providersContainer.querySelectorAll('.btn-wpp').forEach(btn => {
+            btn.addEventListener('click', e => {
+                window.open(e.currentTarget.getAttribute('data-url'), '_blank');
+            });
+        });
+
         feather.replace();
     }
 
     if (formProveedor) {
         formProveedor.addEventListener('submit', e => {
             e.preventDefault();
-            const dias    = Array.from(document.querySelectorAll('.prov-day-check:checked')).map(cb => cb.value);
-            const visita  = dias.length > 0 ? dias.join(', ') : 'No asignado';
+            const dias = Array.from(document.querySelectorAll('.prov-day-check:checked')).map(cb => cb.value);
+            const visita = dias.length > 0 ? dias.join(', ') : 'No asignado';
             const closeDay = document.getElementById('prov-close-day').value;
-            const closeHr  = document.getElementById('prov-close-hr').value;
+            const closeHr = document.getElementById('prov-close-hr').value;
 
             listaProveedores.push({
-                id:            Date.now(),
-                nombre:        document.getElementById('prov-name').value.trim(),
-                rubros:        ['general'],
-                visitaFisica:  visita,
+                id: Date.now(),
+                nombre: document.getElementById('prov-name').value.trim(),
+                rubros: ['general'],
+                visitaFisica: visita,
                 cierreVirtual: `${closeDay} a las ${closeHr}hs`,
-                telefono:      document.getElementById('prov-phone').value.trim() || 'No asignado',
+                telefono: document.getElementById('prov-phone').value.trim() || 'No asignado',
                 enlaceOficial: document.getElementById('prov-url').value.trim() || ''
             });
             formProveedor.reset();
@@ -456,9 +493,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h5>${c.pv.nombre}</h5>
                             <p class="bid-price">$${c.precio.toLocaleString('es-AR')}</p>
                             <p class="bid-delivery">Entrega: ${c.pv.visitaFisica}</p>
-                            <button class="btn-sk mt-auto" type="button"
+                            <button class="btn-sk mt-auto btn-buy" type="button"
                                 style="width:100%;justify-content:center;"
-                                onclick="window.open('${c.pv.enlaceOficial || '#'}', '_blank')">
+                                data-url="${c.pv.enlaceOficial || '#'}">
                                 Ir a comprar
                             </button>
                         </div>
@@ -478,19 +515,15 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(card);
         });
 
+        container.querySelectorAll('.btn-buy').forEach(btn => {
+            btn.addEventListener('click', e => {
+                window.open(e.currentTarget.getAttribute('data-url'), '_blank');
+            });
+        });
+
         feather.replace();
     }
 
-}); // fin DOMContentLoaded
+    feather.replace();
 
-// ══════════════════════════════════════════════════════════════
-// GLOBAL
-// ══════════════════════════════════════════════════════════════
-window.resetUpload = function () {
-    const dz = document.getElementById('dropzone');
-    const rc = document.getElementById('results-container');
-    const fi = document.getElementById('file-input');
-    if (dz) dz.style.display = '';
-    if (rc) rc.classList.add('d-none');
-    if (fi) fi.value = '';
-};
+}); // fin DOMContentLoaded

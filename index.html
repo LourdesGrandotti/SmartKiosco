@@ -235,10 +235,27 @@
                     <i data-feather="grid"></i>
                     <span class="nav-label">Panel</span>
                 </a>
+
+                <!-- Perfil (Solo móvil - 7mo elemento) -->
+                <div class="nav-item d-md-none" id="mobile-user-item">
+                    <div class="sidebar-user-avatar sidebar-user-avatar--sm" id="mobile-user-avatar">?</div>
+                    <span class="nav-label" id="mobile-user-name">Usuario</span>
+                </div>
+
+                <!-- Estos elementos se integran al flujo en móvil -->
+                <button class="nav-item nav-item--btn d-md-none" type="button" data-bs-toggle="modal"
+                    data-bs-target="#modalAyuda">
+                    <i data-feather="help-circle"></i>
+                    <span class="nav-label">Ayuda</span>
+                </button>
+                <button class="nav-item nav-item--btn nav-item--danger d-md-none" id="btn-logout-mobile" type="button">
+                    <i data-feather="log-out"></i>
+                    <span class="nav-label">Salir</span>
+                </button>
             </nav>
 
-            <!-- Sección de usuario (bottom) -->
-            <div class="sidebar-user-section">
+            <!-- Sección de usuario (bottom, solo visible en desktop) -->
+            <div class="sidebar-user-section d-none d-md-flex">
                 <div class="sidebar-divider"></div>
 
                 <!-- Avatar + nombre -->
@@ -281,7 +298,7 @@
                     <p class="dropzone-sub">o hacé clic para explorar en tu computadora</p>
                     <p class="dropzone-fmt">Solo formato CSV</p>
                     <input type="file" id="file-input" accept=".csv" class="file-input">
-                    <button class="btn-sk" type="button" onclick="document.getElementById('file-input').click()">
+                    <button class="btn-sk" type="button" id="btn-browse-files">
                         <i data-feather="folder-open"></i> Explorar archivos
                     </button>
                 </div>
@@ -294,29 +311,29 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-12 col-sm-4">
-                            <div class="stat-card stat-card--critical">
-                                <div class="stat-icon"><i data-feather="alert-triangle"></i></div>
+                            <div class="stat-card stat-card--critical d-flex align-items-center gap-3 h-100">
+                                <div class="stat-icon d-flex align-items-center justify-content-center"><i data-feather="alert-triangle"></i></div>
                                 <div class="stat-info">
-                                    <h5>Stock Crítico</h5>
-                                    <h2 id="critical-count">0</h2>
+                                    <h5 class="mb-1">Stock Crítico</h5>
+                                    <h2 id="critical-count" class="mb-0">0</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-4">
-                            <div class="stat-card stat-card--low">
-                                <div class="stat-icon"><i data-feather="alert-circle"></i></div>
+                            <div class="stat-card stat-card--low d-flex align-items-center gap-3 h-100">
+                                <div class="stat-icon d-flex align-items-center justify-content-center"><i data-feather="alert-circle"></i></div>
                                 <div class="stat-info">
-                                    <h5>Stock Bajo</h5>
-                                    <h2 id="low-count">0</h2>
+                                    <h5 class="mb-1">Stock Bajo</h5>
+                                    <h2 id="low-count" class="mb-0">0</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-4">
-                            <div class="stat-card stat-card--ok">
-                                <div class="stat-icon"><i data-feather="check-circle"></i></div>
+                            <div class="stat-card stat-card--ok d-flex align-items-center gap-3 h-100">
+                                <div class="stat-icon d-flex align-items-center justify-content-center"><i data-feather="check-circle"></i></div>
                                 <div class="stat-info">
-                                    <h5>Stock Normal</h5>
-                                    <h2 id="ok-count">0</h2>
+                                    <h5 class="mb-1">Stock Normal</h5>
+                                    <h2 id="ok-count" class="mb-0">0</h2>
                                 </div>
                             </div>
                         </div>
@@ -342,15 +359,15 @@
                             <span>El reporte fue procesado correctamente.</span>
                         </div>
                         <div>
-                            <button class="btn-sk btn-sk--ghost" type="button" onclick="resetUpload()">
+                            <button class="btn-sk btn-sk--ghost" type="button" id="btn-reset-upload">
                                 <i data-feather="refresh-cw"></i> Cargar otro archivo
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="view-footer view-footer--end">
-                    <button class="btn-sk" type="button" onclick="navTo('ofertas')">
+                <div class="view-footer d-flex justify-content-end">
+                    <button class="btn-sk" type="button" data-nav="ofertas">
                         Ver Ofertas <i data-feather="chevron-right"></i>
                     </button>
                 </div>
@@ -358,10 +375,10 @@
 
             <!-- ── VISTA: OFERTAS ─────────────────────────────── -->
             <section id="view-ofertas" class="view-section hidden">
-                <header class="section-header">
+                <header class="section-header d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1>Comparador de Precios</h1>
-                        <p>Licitación inteligente de tu canasta crítica de reposición.</p>
+                        <h1>Comparador de Ofertas</h1>
+                        <p>Análisis de precios sugeridos según tus proveedores actuales.</p>
                     </div>
                 </header>
 
@@ -369,11 +386,11 @@
                     <p class="empty-state">Cargá un reporte de stock primero para ver cotizaciones inteligentes.</p>
                 </div>
 
-                <div class="view-footer">
-                    <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('stock')">
+                <div class="view-footer d-flex justify-content-between align-items-center">
+                    <button class="btn-sk btn-sk--ghost" type="button" data-nav="stock">
                         <i data-feather="chevron-left"></i> Carga de Stock
                     </button>
-                    <button class="btn-sk" type="button" onclick="navTo('proveedores')">
+                    <button class="btn-sk" type="button" data-nav="proveedores">
                         Ver Proveedores <i data-feather="chevron-right"></i>
                     </button>
                 </div>
@@ -381,10 +398,10 @@
 
             <!-- ── VISTA: PROVEEDORES ─────────────────────────── -->
             <section id="view-proveedores" class="view-section hidden">
-                <header class="section-header">
+                <header class="section-header d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h1>Agenda de Proveedores</h1>
-                        <p>Control de fechas de visita física y cierres de pedidos.</p>
+                        <p>Administrá tus contactos y sus frecuencias de visita.</p>
                     </div>
                 </header>
 
@@ -442,10 +459,8 @@
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <label for="prov-phone" class="form-label text-muted-sk small">Tel WhatsApp
-                                    (opcional)</label>
-                                <input type="tel" id="prov-phone" class="form-control-sk" pattern="[0-9]+"
-                                    placeholder="Ej. 1144445555">
+                                <label for="prov-phone" class="form-label text-muted-sk small">Tel WhatsApp (opcional)</label>
+                                <input type="tel" id="prov-phone" class="form-control-sk" pattern="[0-9]+" placeholder="Ej. 1144445555">
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -467,11 +482,11 @@
 
                 <div class="row g-3" id="providers-container"></div>
 
-                <div class="view-footer">
-                    <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('ofertas')">
+                <div class="view-footer d-flex justify-content-between align-items-center">
+                    <button class="btn-sk btn-sk--ghost" type="button" data-nav="ofertas">
                         <i data-feather="chevron-left"></i> Ofertas
                     </button>
-                    <button class="btn-sk" type="button" onclick="navTo('dashboard')">
+                    <button class="btn-sk" type="button" data-nav="dashboard">
                         Panel de Control <i data-feather="chevron-right"></i>
                     </button>
                 </div>
@@ -479,10 +494,10 @@
 
             <!-- ── VISTA: PANEL DE CONTROL ───────────────────── -->
             <section id="view-dashboard" class="view-section hidden">
-                <header class="section-header">
+                <header class="section-header d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h1>Panel de Control</h1>
-                        <p>Resumen de tu negocio y estado de abastecimiento</p>
+                        <p>Resumen visual de tu inventario y alertas críticas.</p>
                     </div>
                 </header>
 
@@ -493,29 +508,29 @@
                 <div id="dashboard-data" class="d-none">
                     <div class="row g-3 mb-4">
                         <div class="col-12 col-sm-4">
-                            <div class="stat-card stat-card--accent">
-                                <div class="stat-icon"><i data-feather="trending-up"></i></div>
+                            <div class="stat-card stat-card--accent d-flex align-items-center gap-3 h-100">
+                                <div class="stat-icon d-flex align-items-center justify-content-center"><i data-feather="trending-up"></i></div>
                                 <div class="stat-info">
-                                    <h5>Total artículos</h5>
-                                    <h2 id="dash-total">0</h2>
+                                    <h5 class="mb-1">Total artículos</h5>
+                                    <h2 id="dash-total" class="mb-0">0</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-4">
-                            <div class="stat-card stat-card--critical">
-                                <div class="stat-icon"><i data-feather="alert-octagon"></i></div>
+                            <div class="stat-card stat-card--critical d-flex align-items-center gap-3 h-100">
+                                <div class="stat-icon d-flex align-items-center justify-content-center"><i data-feather="alert-octagon"></i></div>
                                 <div class="stat-info">
-                                    <h5>Alertas de quiebre</h5>
-                                    <h2 id="dash-critical">0</h2>
+                                    <h5 class="mb-1">Alertas de quiebre</h5>
+                                    <h2 id="dash-critical" class="mb-0">0</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-4">
-                            <div class="stat-card stat-card--ok">
-                                <div class="stat-icon"><i data-feather="truck"></i></div>
+                            <div class="stat-card stat-card--ok d-flex align-items-center gap-3 h-100">
+                                <div class="stat-icon d-flex align-items-center justify-content-center"><i data-feather="truck"></i></div>
                                 <div class="stat-info">
-                                    <h5>Estado bueno</h5>
-                                    <h2 id="dash-ok">0</h2>
+                                    <h5 class="mb-1">Estado bueno</h5>
+                                    <h2 id="dash-ok" class="mb-0">0</h2>
                                 </div>
                             </div>
                         </div>
@@ -528,11 +543,11 @@
                     </div>
                 </div>
 
-                <div class="view-footer">
-                    <button class="btn-sk btn-sk--ghost" type="button" onclick="navTo('proveedores')">
+                <div class="view-footer d-flex justify-content-between align-items-center">
+                    <button class="btn-sk btn-sk--ghost" type="button" data-nav="proveedores">
                         <i data-feather="chevron-left"></i> Proveedores
                     </button>
-                    <button class="btn-sk" type="button" onclick="navTo('stock')">
+                    <button class="btn-sk" type="button" data-nav="stock">
                         Volver a Carga de Stock <i data-feather="corner-up-left"></i>
                     </button>
                 </div>
@@ -543,7 +558,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="app.js"></script>
-    <script>feather.replace();</script>
 </body>
 
 </html>
