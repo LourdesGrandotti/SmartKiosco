@@ -6,7 +6,8 @@
 const STORAGE_KEYS = {
     usuarios: 'sk_usuarios',
     sesion: 'sk_sesion_activa',
-    proveedores: 'sk_proveedores'
+    proveedores: 'sk_proveedores',
+    stock: 'sk_stock'
 };
 
 const PROVEEDORES_DEFAULT = [
@@ -18,7 +19,7 @@ const PROVEEDORES_DEFAULT = [
 
 let usuariosRegistrados = cargarDesdeStorage(STORAGE_KEYS.usuarios, []);
 let usuarioActivo = cargarDesdeStorage(STORAGE_KEYS.sesion, null);
-let listaProveedores = cargarDesdeStorage(STORAGE_KEYS.proveedores, PROVEEDORES_DEFAULT);
+let listaProveedores = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.proveedores), PROVEEDORES_DEFAULT);
 
 let stockChartInstance = null;
 let chartData = { ok: 0, low: 0, critical: 0 };
@@ -58,6 +59,10 @@ const providersContainer = document.getElementById('providers-container');
 // FUNCIONES — Utilidades
 // ══════════════════════════════════════════════════════════
 
+function claveUsuario(base) {
+    return usuarioActivo ? `${base}_${usuarioActivo}` : base;
+}
+
 function cargarDesdeStorage(clave, porDefecto) {
     try {
         const raw = localStorage.getItem(clave);
@@ -87,6 +92,7 @@ function setText(id, val) {
 function iniciarSesion(usuario) {
     usuarioActivo = usuario;
     guardarEnStorage(STORAGE_KEYS.sesion, usuario);
+    restaurarDatosUsuario();
     authView.style.display = 'none';
     appView.classList.remove('d-none');
     actualizarSidebarUsuario(usuario);
@@ -96,6 +102,32 @@ function iniciarSesion(usuario) {
 function cerrarSesion() {
     usuarioActivo = null;
     guardarEnStorage(STORAGE_KEYS.sesion, null);
+    
+    // Reiniciar lista de proveedores y stock/chartData para no dejar datos visibles
+    listaProveedores = PROVEEDORES_DEFAULT;
+    renderProveedores();
+    
+    resetUpload();
+    chartData = { ok: 0, low: 0, critical: 0 };
+    if (tableBody) tableBody.innerHTML = '';
+    
+    setText('critical-count', '0');
+    setText('low-count', '0');
+    setText('ok-count', '0');
+    setText('dash-total', '0');
+    setText('dash-critical', '0');
+    setText('dash-ok', '0');
+    
+    const dbEmpty = document.getElementById('dashboard-empty');
+    const dbData = document.getElementById('dashboard-data');
+    if (dbEmpty) dbEmpty.classList.remove('d-none');
+    if (dbData) dbData.classList.add('d-none');
+    
+    const offersContainer = document.getElementById('offers-container');
+    if (offersContainer) {
+        offersContainer.innerHTML = '<p class="empty-state">Cargá un reporte de stock primero para ver cotizaciones inteligentes.</p>';
+    }
+
     appView.classList.add('d-none');
     authView.style.display = '';
     formLogin.reset();
@@ -116,8 +148,82 @@ function actualizarSidebarUsuario(nombre) {
     if (mobileLabel) mobileLabel.textContent = nombre;
 }
 
+function restaurarDatosUsuario() {
+    listaProveedores = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.proveedores), PROVEEDORES_DEFAULT);
+    renderProveedores();
+
+    const stockGuardado = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.stock), null);
+    if (stockGuardado && stockGuardado.length > 0) {
+        let critical = 0, low = 0, okCount = 0, html = '';
+
+        stockGuardado.forEach(p => {
+            let status = p.status;
+            let label = p.label;
+            let action = p.action;
+            if (!label || !action) {
+                if (status === 'critical') { label = 'Crítico'; action = 'Pedir inmediato'; }
+                else if (status === 'low') { label = 'Bajo'; action = 'Reponer pronto'; }
+                else { label = 'Normal'; action = 'Mantener'; }
+            }
+
+            if (status === 'critical') critical++;
+            else if (status === 'low') low++;
+            else okCount++;
+
+            html += buildRow(p.name, p.qty, status, label, action);
+        });
+
+        document.getElementById('critical-count').textContent = critical;
+        document.getElementById('low-count').textContent = low;
+        document.getElementById('ok-count').textContent = okCount;
+        tableBody.innerHTML = html;
+
+        const total = stockGuardado.length;
+        setText('dash-total', total);
+        setText('dash-critical', critical);
+        setText('dash-ok', okCount);
+
+        chartData = { ok: okCount, low, critical };
+
+        if (total > 0) {
+            document.getElementById('dashboard-empty').classList.add('d-none');
+            document.getElementById('dashboard-data').classList.remove('d-none');
+        }
+
+        if (dropzone) dropzone.style.display = 'none';
+        if (resultsContainer) resultsContainer.classList.remove('d-none');
+
+        generarSugerencias(stockGuardado);
+        feather.replace();
+    } else {
+        resetUpload();
+        
+        document.getElementById('critical-count').textContent = '0';
+        document.getElementById('low-count').textContent = '0';
+        document.getElementById('ok-count').textContent = '0';
+        tableBody.innerHTML = '';
+        
+        setText('dash-total', '0');
+        setText('dash-critical', '0');
+        setText('dash-ok', '0');
+        
+        chartData = { ok: 0, low: 0, critical: 0 };
+        
+        const dbEmpty = document.getElementById('dashboard-empty');
+        const dbData = document.getElementById('dashboard-data');
+        if (dbEmpty) dbEmpty.classList.remove('d-none');
+        if (dbData) dbData.classList.add('d-none');
+        
+        const offersContainer = document.getElementById('offers-container');
+        if (offersContainer) {
+            offersContainer.innerHTML = '<p class="empty-state">Cargá un reporte de stock primero para ver cotizaciones inteligentes.</p>';
+        }
+    }
+}
+
 function restaurarSesion() {
     if (usuarioActivo) {
+        restaurarDatosUsuario();
         authView.style.display = 'none';
         appView.classList.remove('d-none');
         actualizarSidebarUsuario(usuarioActivo);
@@ -240,7 +346,7 @@ function analyzeStock(csvText) {
             if (qty <= 3) { status = 'critical'; label = 'Crítico'; action = 'Pedir inmediato'; critical++; }
             else if (qty <= 10) { status = 'low'; label = 'Bajo'; action = 'Reponer pronto'; low++; }
             else { status = 'ok'; label = 'Normal'; action = 'Mantener'; ok++; }
-            globalStock.push({ name, qty, status, categoria });
+            globalStock.push({ name, qty, status, label, action, categoria });
             html += buildRow(name, qty, status, label, action);
         }
     }
@@ -263,6 +369,7 @@ function analyzeStock(csvText) {
     }
 
     generarSugerencias(globalStock);
+    guardarEnStorage(claveUsuario(STORAGE_KEYS.stock), globalStock);
 }
 
 function resetUpload() {
@@ -331,7 +438,7 @@ function renderProveedores() {
             if (!confirm('¿Seguro que querés eliminar este proveedor?')) return;
             const id = parseInt(e.currentTarget.getAttribute('data-id'));
             listaProveedores = listaProveedores.filter(p => p.id !== id);
-            guardarEnStorage(STORAGE_KEYS.proveedores, listaProveedores);
+            guardarEnStorage(claveUsuario(STORAGE_KEYS.proveedores), listaProveedores);
             renderProveedores();
         });
     });
@@ -558,7 +665,7 @@ if (formProveedor) {
             enlaceOficial: document.getElementById('prov-url').value.trim() || ''
         });
 
-        guardarEnStorage(STORAGE_KEYS.proveedores, listaProveedores);
+        guardarEnStorage(claveUsuario(STORAGE_KEYS.proveedores), listaProveedores);
         formProveedor.reset();
         renderProveedores();
     });
