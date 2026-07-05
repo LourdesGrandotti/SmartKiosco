@@ -320,7 +320,7 @@ body {
     align-items: center;
     gap: 10px;
     margin-bottom: 2rem;
-    padding: 0 0.5rem;
+    padding: 0 22px;
     width: 100%;
     overflow: hidden;
     flex-shrink: 0;
@@ -454,12 +454,14 @@ body {
     font-weight: 700;
     color: #fff;
     flex-shrink: 0;
+    margin-left: -6.5px;
 }
 
 .sidebar-user-avatar--sm {
     width: 24px;
     height: 24px;
     font-size: 0.7rem;
+    margin-left: 0;
 }
 
 .sidebar-user-name {

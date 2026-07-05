@@ -19,7 +19,7 @@ const PROVEEDORES_DEFAULT = [
 
 let usuariosRegistrados = cargarDesdeStorage(STORAGE_KEYS.usuarios, []);
 let usuarioActivo = cargarDesdeStorage(STORAGE_KEYS.sesion, null);
-let listaProveedores = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.proveedores), [...PROVEEDORES_DEFAULT]);
+let listaProveedores = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.proveedores), PROVEEDORES_DEFAULT);
 
 let stockChartInstance = null;
 let chartData = { ok: 0, low: 0, critical: 0 };
@@ -66,22 +66,10 @@ function claveUsuario(base) {
 function cargarDesdeStorage(clave, porDefecto) {
     try {
         const raw = localStorage.getItem(clave);
-        if (raw) return JSON.parse(raw);
+        return raw ? JSON.parse(raw) : porDefecto;
     } catch {
-        // Ignorar error de lectura
+        return porDefecto;
     }
-    
-    // Clonamos porDefecto si es un objeto/array para evitar mutación por referencia
-    if (porDefecto && typeof porDefecto === 'object') {
-        try {
-            return typeof structuredClone === 'function' 
-                ? structuredClone(porDefecto) 
-                : JSON.parse(JSON.stringify(porDefecto));
-        } catch {
-            return porDefecto;
-        }
-    }
-    return porDefecto;
 }
 
 function guardarEnStorage(clave, valor) {
@@ -116,11 +104,12 @@ function cerrarSesion() {
     guardarEnStorage(STORAGE_KEYS.sesion, null);
     
     // Reiniciar lista de proveedores y stock/chartData para no dejar datos visibles
-    listaProveedores = [...PROVEEDORES_DEFAULT];
+    listaProveedores = PROVEEDORES_DEFAULT;
     renderProveedores();
     
     resetUpload();
     chartData = { ok: 0, low: 0, critical: 0 };
+    initStockChart();
     if (tableBody) tableBody.innerHTML = '';
     
     setText('critical-count', '0');
@@ -161,7 +150,7 @@ function actualizarSidebarUsuario(nombre) {
 }
 
 function restaurarDatosUsuario() {
-    listaProveedores = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.proveedores), [...PROVEEDORES_DEFAULT]);
+    listaProveedores = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.proveedores), PROVEEDORES_DEFAULT);
     renderProveedores();
 
     const stockGuardado = cargarDesdeStorage(claveUsuario(STORAGE_KEYS.stock), null);
@@ -196,6 +185,7 @@ function restaurarDatosUsuario() {
         setText('dash-ok', okCount);
 
         chartData = { ok: okCount, low, critical };
+        initStockChart();
 
         if (total > 0) {
             document.getElementById('dashboard-empty').classList.add('d-none');
@@ -270,7 +260,7 @@ function navigateTo(viewId) {
 
 function initStockChart() {
     const canvas = document.getElementById('stockChart');
-    if (!canvas) return;
+    if (!canvas || canvas.offsetParent === null) return;
     if (stockChartInstance) stockChartInstance.destroy();
 
     stockChartInstance = new Chart(canvas.getContext('2d'), {
@@ -374,6 +364,7 @@ function analyzeStock(csvText) {
     setText('dash-ok', ok);
 
     chartData = { ok, low, critical };
+    initStockChart();
 
     if (total > 0) {
         document.getElementById('dashboard-empty').classList.add('d-none');
